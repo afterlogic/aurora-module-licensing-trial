@@ -11,30 +11,38 @@ class Module extends \Aurora\System\Module\AbstractModule
 	
 	public function onAfterGetLicenseKey($Args, &$Result)
 	{
-		if (empty($Result))
+		try
 		{
-			$sRemoteUrl = $this->getConfig('RemoteHost', '');
+			\Aurora\System\Api::checkUserRoleIsAtLeast(\Aurora\System\Enums\UserRole::SuperAdmin);
 			
-			$oResponse = empty($sRemoteUrl) ? null : json_decode(\file_get_contents($sRemoteUrl));
-			
-			if ($oResponse)
+			if (empty($Result))
 			{
-				if (isset($oResponse->success) && $oResponse->success === true && !empty($oResponse->key))
+				$sRemoteUrl = $this->getConfig('RemoteHost', '');
+				$oResponse = empty($sRemoteUrl) ? null : json_decode(\file_get_contents($sRemoteUrl));
+				
+				if ($oResponse)
 				{
-					$Result = $oResponse->key;
-
-					$oLicensingDecorator = \Aurora\System\Api::GetModuleDecorator('Licensing');
-
-					if ($oLicensingDecorator)
+					if (isset($oResponse->success) && $oResponse->success === true && !empty($oResponse->key))
 					{
-						$oLicensingDecorator->UpdateSettings($Result);
+						$Result = $oResponse->key;
+
+						$oLicensingDecorator = \Aurora\System\Api::GetModuleDecorator('Licensing');
+
+						if ($oLicensingDecorator)
+						{
+							$oLicensingDecorator->UpdateSettings($Result);
+						}
+					}
+					else
+					{
+						\Aurora\System\Api::Log('Bad response from Key Service', \Aurora\System\Enums\LogLevel::Error);
 					}
 				}
-				else
-				{
-					\Aurora\System\Api::Log('Bad response from Key Service', \Aurora\System\Enums\LogLevel::Error);
-				}
 			}
+		}
+		catch (\Aurora\System\Exceptions\ApiException $oException)
+		{
+			
 		}
 	}
 }
