@@ -7,6 +7,8 @@
 
 namespace Aurora\Modules\LicensingTrial;
 
+use Aurora\Api;
+
 /**
  * @license https://www.gnu.org/licenses/agpl-3.0.html AGPL-3.0
  * @license https://afterlogic.com/products/common-licensing Afterlogic Software License
@@ -34,7 +36,8 @@ class Module extends \Aurora\System\Module\AbstractModule
                     if (isset($oResponse->success) && $oResponse->success === true && !empty($oResponse->key)) {
                         $Result = $oResponse->key;
 
-                        $oLicensingDecorator = \Aurora\System\Api::GetModuleDecorator('Licensing');
+                        /** @var \Aurora\Modules\Licensing\Module $oLicensingDecorator */
+                        $oLicensingDecorator = Api::GetModuleDecorator('Licensing');
 
                         if ($oLicensingDecorator) {
                             $oLicensingDecorator->UpdateSettings($Result);
