@@ -23,6 +23,15 @@ class Module extends \Aurora\System\Module\AbstractModule
         $this->subscribeEvent('Licensing::GetLicenseKey::after', array($this, 'onAfterGetLicenseKey'));
     }
 
+    /**
+     *
+     * @return Module
+     */
+    public static function Decorator()
+    {
+        return parent::Decorator();
+    }
+
     public function onAfterGetLicenseKey($Args, &$Result)
     {
         try {
